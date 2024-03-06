@@ -1,0 +1,3 @@
+val myDF = spark.sql("select * from test.test_table");
+myDF.coalesce(1).write.mode("overwrite").csv("file:///opt/dse/output/");
+System.exit(0);
