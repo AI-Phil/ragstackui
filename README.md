@@ -20,7 +20,7 @@ docker build -t text2sparksql:latest .
 Run the container, accepting the DSE license, and include the Spark `-k` option:
 
 ```
-docker run -e DS_LICENSE=accept --name dse -d text2sparksql:latest -k
+docker run -e DS_LICENSE=accept --name dse --network dse-net -d text2sparksql:latest -k
 ```
 
 #### Wait for Container to Fully Start
@@ -72,3 +72,36 @@ And you will now have an `output` directory with a `.csv` file named something l
 ```
 1,This is a test
 ```
+
+
+### Fastapi Container
+
+**Run these commands within the `fastapi` directory. First, build the Docker image:**
+
+#### Build Container
+
+```
+docker build -t text2sparksql-fastapi:latest .
+```
+
+#### Start Container
+Run the container (change exposed port if you wish, update other directives with this different port accordingly):
+
+```
+docker run --name fastapi --network dse-net -p 8080:80 -d text2sparksql-fastapi:latest
+```
+
+#### Test Container
+
+First confirm the FastAPI server is running by navigating to [http://localhost:8080/](http://localhost:8080/). You should see a page with content:
+
+```
+{"message":"Hello, World! Fastapi Container is Working!"}
+```
+
+Next confirm the CQL interface to DSE is working running by navigating to [http://localhost:8080/test-cql](http://localhost:8080/test-cql). You should see a page with content:
+
+```
+{"data":[{"foo":1,"bar":"This is a test"}]}
+```
+

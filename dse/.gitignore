@@ -1,1 +1,4 @@
 output/
+byos.properties
+byos.jar
+schema.sql
