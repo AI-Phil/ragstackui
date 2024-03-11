@@ -76,7 +76,11 @@ And you will now have an `output` directory with a `.csv` file named something l
 
 ### Fastapi Container
 
-**Run these commands within the `fastapi` directory. First, build the Docker image:**
+**Run these commands within the `fastapi` directory.**
+
+#### Environment File
+
+Create a copy of the `.env.template` file into a file called `.env`, and set up values as appropriate.
 
 #### Build Container
 
@@ -88,7 +92,7 @@ docker build -t text2sparksql-fastapi:latest .
 Run the container (change exposed port if you wish, update other directives with this different port accordingly):
 
 ```
-docker run --name fastapi --network dse-net -p 8080:80 -d text2sparksql-fastapi:latest
+docker run --name fastapi --network dse-net -p 8080:80 --env-file ./.env -d text2sparksql-fastapi:latest
 ```
 
 #### Test Container
@@ -105,3 +109,8 @@ Next confirm the CQL interface to DSE is working running by navigating to [http:
 {"data":[{"foo":1,"bar":"This is a test"}]}
 ```
 
+Next, confirm the LLM functions by navigating to [http://localhost:8080/test-llm?city=Dublin](http://localhost:8080/test-llm?city=Dublin). You should see a page with content similar to:
+
+```
+{"data":"Morning:\n- Start the day with a visit to Trinity College to see the Book of Kells and explore the beautiful campus.\n- Stroll through the lively streets of Temple Bar, known for its trendy shops, cafes, and street performers.\n- Enjoy a traditional Irish breakfast at a local cafe.\n\nAfternoon:\n- Visit the Guinness Storehouse for a tour of the brewery and a pint of Guinness at the rooftop bar with panoramic views of the city.\n- Explore Dublin Castle and learn about the city's history and heritage.\n- Take a walk along the River Liffey and cross the iconic Ha'penny Bridge.\n\nEvening:\n- Have dinner at a cozy Irish pub and enjoy live music and dancing.\n- End the day with a visit to the lively Grafton Street for some shopping and street entertainment."}
+```

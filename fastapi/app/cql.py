@@ -1,5 +1,6 @@
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
+import re
 
 CASSANDRA_CONTACT_POINTS = ['dse']
 CASSANDRA_PORT = 9042
@@ -17,8 +18,24 @@ class CassandraConnector:
         """
         Executes a CQL query and returns the results in JSON format.
         """
+
+        # Basic sanity checks
+        query_trimmed = query.strip()
+        if not query_trimmed.lower().startswith("select"):
+            raise Exception("Query must start with SELECT.")
+
+        # Allow a trailing semicolon
+        query_trimmed = query_trimmed.rstrip(';')
+        
+        # Check for semicolons not encapsulated within quotes
+        query_sanitized = re.sub(r"'.*?'", '', query_trimmed)    # Remove single-quoted strings
+        query_sanitized = re.sub(r'".*?"', '', query_sanitized)  # Remove double-quoted strings
+        
+        if ";" in query_sanitized:
+            raise Exception("Query contains invalid characters or sequence.")
+
         try:
-            rows = self.session.execute(query)
+            rows = self.session.execute(query_trimmed)
             result_json = [{column: getattr(row, column) for column in row._fields} for row in rows]
             return result_json
         except Exception as e:
