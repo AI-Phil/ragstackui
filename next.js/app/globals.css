@@ -31,3 +31,11 @@ body {
     text-wrap: balance;
   }
 }
+
+@layer utilities {
+  .menu-icon-hidden-md {
+    @screen md {
+      display: none !important;
+    }
+  }
+}
