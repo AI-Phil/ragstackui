@@ -1,7 +1,3 @@
 fastapi
 pydantic
 uvicorn
-cassandra-driver
-openai
-langchain
-langchain_openai

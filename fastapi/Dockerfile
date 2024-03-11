@@ -8,6 +8,10 @@ RUN apt update && \
 # Install dependencies for the main app
 WORKDIR /code
 
+ARG RAGSTACK_AI_VERSION=0.8.0
+ARG OPENAI_VERSION=1.13.3
+RUN pip install --no-cache-dir ragstack-ai==${RAGSTACK_AI_VERSION} openai==${OPENAI_VERSION}
+
 COPY ./requirements.txt /code/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
