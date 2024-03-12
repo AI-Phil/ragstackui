@@ -1,15 +1,17 @@
 'use server'
-import { getRAGStackApiEndpoint as getRAGStackApiEndpoint } from '../settings/config.server';
+import { getRAGStackApiEndpoint } from '../settings/config.server';
 import { RAGStackApiResponse } from './ragstack-api.interfaces';
 
 export interface TestCQLData {
-  foo: number;
-  bar: string;
+  data_center: string;
+  schema_version: string;
 }
 
-export async function getTestCQL(): Promise<RAGStackApiResponse<TestCQLData[]>> {
-    const fastApiEndpoint = await getRAGStackApiEndpoint();
-    const response = await fetch(`${fastApiEndpoint}/test-cql`);
+export type CqlDB = 'dse' | 'astra';
+
+export async function getTestCQL(cqlDB: CqlDB): Promise<RAGStackApiResponse<TestCQLData[]>> {
+    const ragstackApiEndpoint = await getRAGStackApiEndpoint();
+    const response = await fetch(`${ragstackApiEndpoint}/test-cql?db=${cqlDB}`);
     const data = await response.json();
     return data;
   }

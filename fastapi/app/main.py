@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
-from app.cql import CassandraConnector
+from app.cql import CassandraConnectionsManager
 import os
 import openai
 from langchain_openai import ChatOpenAI
@@ -8,8 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 app = FastAPI()
 
-cassandra_connector = CassandraConnector()
-
+connections_manager = CassandraConnectionsManager()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.get("/")
@@ -20,25 +19,31 @@ def read_root():
     return {"message": "Hello, World! Fastapi Container is Working!"}
 
 @app.get("/test-cql")
-def test_cql():
+def test_cql(db: str = Query(..., min_length=1)):
     """
-    Endpoint to test Cassandra CQL queries.
+    Endpoint to test Cassandra CQL queries. 'db' specifies which database to query.
     """
     try:
-        result_json = cassandra_connector.run_cql_query("SELECT * FROM test.test_table")
+        connector = connections_manager.get_connector(db)
+        result_json = connector.run_cql_query("SELECT data_center, schema_version FROM system.local")
         return {"data": result_json}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="An error occurred while querying the database.")
 
 @app.get("/run-cql")
-def run_cql(query: str = Query(..., min_length=1)):
+def run_cql(query: str = Query(..., min_length=1), db: str = Query(..., min_length=1)):
     """
-    Endpoint to run a provided CQL query string after basic sanity checks.
+    Endpoint to run a provided CQL query string. 'db' specifies which database to query.
     """
     try:
-        result_json = cassandra_connector.run_cql_query(query)
+        connector = connections_manager.get_connector(db)
+        result_json = connector.run_cql_query(query)
         return {"data": result_json}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="An error occurred while querying the database.")

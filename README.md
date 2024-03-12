@@ -103,10 +103,10 @@ First confirm the FastAPI server is running by navigating to [http://localhost:8
 {"message":"Hello, World! Fastapi Container is Working!"}
 ```
 
-Next confirm the CQL interface to DSE is working running by navigating to [http://localhost:8080/test-cql](http://localhost:8080/test-cql). You should see a page with content:
+Next confirm the CQL interface to DSE is working running by navigating to [http://localhost:8080/test-cql?db=dse](http://localhost:8080/test-cql?db=dse). You should see a page with content:
 
 ```
-{"data":[{"foo":1,"bar":"This is a test"}]}
+{"data":[{"data_center":"dc1","schema_version":"42ce1837-8122-3c50-b694-68185a247dd4"}]}
 ```
 
 Next, confirm the LLM functions by navigating to [http://localhost:8080/test-llm?city=Dublin](http://localhost:8080/test-llm?city=Dublin). You should see a page with content similar to:
