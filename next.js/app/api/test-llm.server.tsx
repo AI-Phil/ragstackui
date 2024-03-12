@@ -1,9 +1,10 @@
 'use server'
-import { getFastApiEndpoint } from '../settings/config.server';
+import { getRAGStackApiEndpoint } from '../settings/config.server';
+import { RAGStackApiResponse } from './ragstack-api.interfaces';
 
-export async function getTestLLM() {
-    const fastApiEndpoint = await getFastApiEndpoint();
-    const response = await fetch(`${fastApiEndpoint}/test-llm?city=Dublin`);
+export async function getTestLLM(): Promise<RAGStackApiResponse<string>> {
+    const ragstackApiEndpoint = await getRAGStackApiEndpoint();
+    const response = await fetch(`${ragstackApiEndpoint}/test-llm?city=Dublin`);
     const data = await response.json();
     return data;
   }

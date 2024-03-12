@@ -1,5 +1,5 @@
 'use server'
-export async function getFastApiEndpoint(): Promise<string> {
-    return process.env.FASTAPI_ENDPOINT || "http://fastapi:80";
+export async function getRAGStackApiEndpoint(): Promise<string> {
+    return process.env.RAGSTACK_API_ENDPOINT || "http://fastapi:80";
   }
   

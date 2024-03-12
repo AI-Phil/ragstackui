@@ -2,16 +2,19 @@
 
 import { useState } from 'react';
 import Menu from '../components/Menu';
-import { getTestCQL } from '../api/test-cql.server';
+import { RAGStackApiResponse } from '../api/ragstack-api.interfaces';
+import { getTestCQL, TestCQLData } from '../api/test-cql.server';
 import { getTestLLM } from '../api/test-llm.server';
+
+type TabName = 'cql' | 'llm';
 
 export default function TestSetup() {
     const [activeTab, setActiveTab] = useState('');
-    const [cqlData, setCqlData] = useState(undefined);
-    const [llmData, setLLMData] = useState(undefined);
+    const [cqlData, setCqlData] = useState<RAGStackApiResponse<TestCQLData[]>>();
+    const [llmData, setLLMData] = useState<RAGStackApiResponse<string>>();
     const [loading, setLoading] = useState(false);
 
-    const fetchData = async (tab) => {
+    const fetchData = async (tab: TabName) => {
         if (tab === 'cql' && cqlData === undefined) {
             setLoading(true);
             const data = await getTestCQL();
@@ -25,7 +28,7 @@ export default function TestSetup() {
         }
     };
 
-    const handleTabChange = async (tab) => {
+    const handleTabChange = async (tab: TabName) => {
         if (activeTab !== tab) {
             setActiveTab(tab); // Set the active tab
             setCqlData(undefined); // Reset CQL data state
