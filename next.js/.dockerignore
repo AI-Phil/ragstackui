@@ -1,0 +1,22 @@
+# Git and version control
+.git
+.gitignore
+
+# Environment variables
+.env*
+!.env.example
+
+# Docker
+Dockerfile
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode
+.idea
+
+# Other non-essential files
+README.md

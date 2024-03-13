@@ -2,3 +2,5 @@ fastapi
 pydantic
 uvicorn
 requests
+# Initially built with ragstack-ai==0.8.0
+ragstack-ai

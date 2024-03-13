@@ -140,3 +140,30 @@ Evening:
 
 This itinerary provides a great mix of historical landmarks, cultural experiences, and delicious Irish cuisine. Enjoy your day in Dublin!
 ```
+
+### Next.js Container
+
+**Run these commands within the `next.js` directory.**
+
+#### Build Container
+
+```
+docker build --target production -t text2sparksql-next.js:latest .
+```
+
+#### Start Container
+Run the container (change exposed port if you wish, update other directives with this different port accordingly):
+
+```
+docker run --name next.js --network dse-net -p 3030:3000 -d text2sparksql-next.js:latest
+```
+
+#### Test Container
+
+First confirm the Next.js server is running by navigating to [http://localhost:3030/](http://localhost:3030/). You should see a page with a menu on the top, and page content:
+
+```
+Hello, World!
+```
+
+Navigate to [Test Setup](http://localhost:3030/test-setup). There are two subtabs, "Test CQL" and "Test LLM". Confirm that the two CQL databases (Astra and DSE) return back content similar to what you found in the FastAPI container testing, and that the LLM test will give you a day tour suggestion (try your own town/city).
