@@ -1,6 +1,4 @@
-export interface RAGStackApiResponse<T> {
-    data: T;
-    error?: string;
-  }
-  
+export interface ApiErrorResponse {
+    detail: string;
+}
   

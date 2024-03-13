@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import PlainTextResponse
 from app.cql import CassandraConnectionsManager
 import os
 import openai
@@ -16,7 +17,7 @@ def read_root():
     """
     Basic echo function  
     """
-    return {"message": "Hello, World! Fastapi Container is Working!"}
+    return "Hello, World! Fastapi Container is Working!"
 
 @app.get("/test-cql")
 def test_cql(db: str = Query(..., min_length=1)):
@@ -26,7 +27,7 @@ def test_cql(db: str = Query(..., min_length=1)):
     try:
         connector = connections_manager.get_connector(db)
         result_json = connector.run_cql_query("SELECT data_center, schema_version FROM system.local")
-        return {"data": result_json}
+        return result_json
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -41,14 +42,14 @@ def run_cql(query: str = Query(..., min_length=1), db: str = Query(..., min_leng
     try:
         connector = connections_manager.get_connector(db)
         result_json = connector.run_cql_query(query)
-        return {"data": result_json}
+        return result_json
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="An error occurred while querying the database.")
 
-@app.get("/test-llm")
+@app.get("/test-llm", response_class=PlainTextResponse)
 def test_llm(city: str = Query("city", min_length=1)):
     try:
         chat_model = os.environ.get("OPENAI_CHAT_MODEL")
@@ -60,7 +61,7 @@ def test_llm(city: str = Query("city", min_length=1)):
         output_parser = StrOutputParser ()
         chain = prompt | llm | output_parser
         response = chain.invoke({"city": city})
-        return {"data": response}
+        return response
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="An error occurred while invoking the LLM.")

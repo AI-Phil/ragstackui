@@ -2,28 +2,34 @@
 
 import { useState } from 'react';
 import Menu from '../components/Menu';
-import { RAGStackApiResponse } from '../../types/RAGStack/ragstack';
+import { ApiErrorResponse } from '../../types/RAGStack/ragstack';
 import { TestCQLData, CqlDB } from '../../types/RAGStack/test-cql';
 
 type TabName = 'cql' | 'llm';
 
 export default function TestSetup() {
     const [activeTab, setActiveTab] = useState<TabName | ''>('');
-    const [cqlData, setCqlData] = useState<RAGStackApiResponse<TestCQLData[]>>();
-    const [llmData, setLLMData] = useState<RAGStackApiResponse<string>>();
+    const [error, setError] = useState<string | null>(null);
+    const [cqlData, setCqlData] = useState<TestCQLData[] | null>(null);
+    const [llmData, setLLMData] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [database, setDatabase] = useState<CqlDB>('dse');
 
     const runCQLQuery = async () => {
         setLoading(true);
-        setCqlData(undefined);
+        setError(null);
+        setCqlData(null);
         try {
             const response = await fetch(`/api/RAGStack/test-cql?db=${database}`);
-            if (!response.ok) throw new Error('Failed to fetch CQL data');
-            const data: RAGStackApiResponse<TestCQLData[]> = await response.json();
+            if (!response.ok) {
+                const errResponse: ApiErrorResponse = await response.json();
+                throw new Error(errResponse.detail);
+            }
+            const data: TestCQLData[] = await response.json();
             setCqlData(data);
-        } catch (error) {
-            console.error("Error fetching CQL data:", error);
+        } catch (err) {
+            // TypeScript sees 'err' as unknown, so we need to assert the type if we want to read 'message'
+            setError((err as Error).message || 'An unexpected error occurred');
         } finally {
             setLoading(false);
         }
@@ -31,15 +37,18 @@ export default function TestSetup() {
 
     const runLLMQuery = async () => {
         setLoading(true);
-        setLLMData(undefined);
+        setError(null);
+        setLLMData(null);
         try {
             const response = await fetch(`/api/RAGStack/test-llm?city=Dublin`);
-            if (!response.ok) throw new Error('Failed to fetch LLM data');
+            if (!response.ok) {
+                const errResponse: ApiErrorResponse = await response.json();
+                throw new Error(errResponse.detail);
+            }
             const textData = await response.text();
-            const data: RAGStackApiResponse<string> = { data: textData };
-            setLLMData(data);
-        } catch (error) {
-            console.error("Error fetching LLM data:", error);
+            setLLMData(textData);
+        } catch (err) {
+            setError((err as Error).message || 'An unexpected error occurred');
         } finally {
             setLoading(false);
         }
@@ -99,7 +108,7 @@ export default function TestSetup() {
                     {loading && <p>Calling for data...</p>}
                     {cqlData && (
                         <div className="whitespace-pre-wrap bg-white p-4 border rounded shadow mt-4">
-                            {JSON.stringify(cqlData.data, null, 2)}
+                            {JSON.stringify(cqlData, null, 2)}
                         </div>
                     )}
                 </div>
@@ -115,7 +124,7 @@ export default function TestSetup() {
                     {loading && <p>Calling for data...</p>}
                     {llmData && (
                         <div className="whitespace-pre-wrap bg-white p-4 border rounded shadow">
-                            {llmData.data}
+                            {llmData}
                         </div>
                     )}
                 </div>
