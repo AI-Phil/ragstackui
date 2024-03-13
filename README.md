@@ -12,21 +12,21 @@ The intent of this repository is to demonstrate how Generative AI can be used to
 #### Build Container
 Run these commands within the `dse` directory. First, build the Docker image:
 
-```
+```bash
 docker build -t text2sparksql:latest .
 ```
 
 #### Start Container
 Run the container, accepting the DSE license, and include the Spark `-k` option:
 
-```
-docker run -e DS_LICENSE=accept --name dse --network dse-net -d text2sparksql:latest -k
+```bash
+docker run -e DS_LICENSE=accept --name dse --network dse-net -p 9042:9042 -d text2sparksql:latest -k
 ```
 
 #### Wait for Container to Fully Start
 Watch the logs:
 
-```
+```bash
 docker logs --follow dse
 ```
 
@@ -46,7 +46,7 @@ INFO  [dispatcher-event-loop-5] 2024-03-06 09:50:57,433  Logging.scala:54 - Succ
 
 Test the Spark install is working:
 
-```
+```bash
 docker exec dse /tmp/spark/run.sh -i /tmp/spark/test.spark
 ```
 
@@ -63,7 +63,7 @@ Spark SqlContext (Deprecated use Spark Session instead) available as 'sqlContext
 
 You can copy the output to your local machine:
 
-```
+```bash
 docker cp dse:/opt/dse/output/ .
 ```
 
@@ -73,25 +73,24 @@ And you will now have an `output` directory with a `.csv` file named something l
 1,This is a test
 ```
 
-
 ### Fastapi Container
 
 **Run these commands within the `fastapi` directory.**
 
 #### Environment File
 
-Create a copy of the `.env.template` file into a file called `.env`, and set up values as appropriate.
+Create a copy of the `.env.template` file into a file called `.env`, and set up values as appropriate. You can leave `DSE_CONNECTION` as it is (it will connect to the `dse` Docker container, via the Docker network).
 
 #### Build Container
 
-```
+```bash
 docker build -t text2sparksql-fastapi:latest .
 ```
 
 #### Start Container
 Run the container (change exposed port if you wish, update other directives with this different port accordingly):
 
-```
+```bash
 docker run --name fastapi --network dse-net -p 8080:80 --env-file ./.env -d text2sparksql-fastapi:latest
 ```
 
@@ -147,14 +146,14 @@ This itinerary provides a great mix of historical landmarks, cultural experience
 
 #### Build Container
 
-```
+```bash
 docker build --target production -t text2sparksql-next.js:latest .
 ```
 
 #### Start Container
 Run the container (change exposed port if you wish, update other directives with this different port accordingly):
 
-```
+```bash
 docker run --name next.js --network dse-net -p 3030:3000 -d text2sparksql-next.js:latest
 ```
 

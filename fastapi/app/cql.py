@@ -30,13 +30,19 @@ class CassandraConnectionsManager:
         # Setup DSE connection if DSE_CONNECTION env var is set
         dse_conn_str = os.getenv("DSE_CONNECTION")
         if dse_conn_str:
-            self.connections['dse'] = CassandraConnector(**parse_connection_args_json(dse_conn_str))
+            try:
+                self.connections['dse'] = CassandraConnector(**parse_connection_args_json(dse_conn_str))
+            except:
+                print(f"Failed to setup DSE connection with DSE_CONNECTION environment variable")
 
         # Setup Astra connection if Astra env vars are set
         astra_endpoint = os.getenv("ASTRA_DB_API_ENDPOINT")
         astra_token = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
         if astra_endpoint and astra_token:
-            self.connections['astra'] = CassandraConnector(astra={'endpoint': astra_endpoint, 'token': astra_token})
+            try:
+                self.connections['astra'] = CassandraConnector(astra={'endpoint': astra_endpoint, 'token': astra_token})
+            except:
+                print(f"Failed to setup Astra connection with endpoint: {astra_endpoint}")
 
     def get_connector(self, db_key):
         if db_key not in self.connections:
