@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Menu from '../components/Menu';
 import { ApiErrorResponse } from '../../types/RAGStack/ragstack';
 import { TestCQLData, CqlDB } from '../../types/RAGStack/test-cql';
 
@@ -77,7 +76,6 @@ export default function TestSetup() {
     
     return (
         <div>
-            <Menu />
             <div className="text-center p-4">
                 <h1 className="text-4xl font-bold">Test Setup Page</h1>
             </div>
