@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, StreamingResponse
 from app.cql import CassandraConnectionsManager
 import os
 import openai
@@ -49,7 +49,7 @@ def run_cql(query: str = Query(..., min_length=1), db: str = Query(..., min_leng
         print(e)
         raise HTTPException(status_code=500, detail="An error occurred while querying the database.")
 
-@app.get("/test-llm", response_class=PlainTextResponse)
+@app.get("/test-llm", response_class=StreamingResponse)
 def test_llm(city: str = Query("city", min_length=1)):
     try:
         chat_model = os.environ.get("OPENAI_CHAT_MODEL")
@@ -60,8 +60,13 @@ def test_llm(city: str = Query("city", min_length=1)):
         ])
         output_parser = StrOutputParser ()
         chain = prompt | llm | output_parser
-        response = chain.invoke({"city": city})
-        return response
+        
+        async def generator():
+            async for chunk in chain.astream({"city": city}):
+                yield chunk
+        
+        return StreamingResponse(generator())
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="An error occurred while invoking the LLM.")
