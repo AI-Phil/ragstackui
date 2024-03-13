@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import Menu from '../components/Menu';
-import { RAGStackApiResponse } from '../api/ragstack-api.interfaces';
-import { getTestCQL, TestCQLData, CqlDB } from '../api/test-cql.server';
-import { getTestLLM } from '../api/test-llm.server';
+import { RAGStackApiResponse } from '../../types/RAGStack/ragstack';
+import { TestCQLData, CqlDB } from '../../types/RAGStack/test-cql';
 
 type TabName = 'cql' | 'llm';
 
@@ -17,20 +16,33 @@ export default function TestSetup() {
 
     const runCQLQuery = async () => {
         setLoading(true);
-        // Clear existing data
         setCqlData(undefined);
-        const data = await getTestCQL(database);
-        setCqlData(data);
-        setLoading(false);
+        try {
+            const response = await fetch(`/api/RAGStack/test-cql?db=${database}`);
+            if (!response.ok) throw new Error('Failed to fetch CQL data');
+            const data: RAGStackApiResponse<TestCQLData[]> = await response.json();
+            setCqlData(data);
+        } catch (error) {
+            console.error("Error fetching CQL data:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const runLLMQuery = async () => {
         setLoading(true);
-        // Clear existing data
         setLLMData(undefined);
-        const data = await getTestLLM();
-        setLLMData(data);
-        setLoading(false);
+        try {
+            const response = await fetch(`/api/RAGStack/test-llm?city=Dublin`);
+            if (!response.ok) throw new Error('Failed to fetch LLM data');
+            const textData = await response.text();
+            const data: RAGStackApiResponse<string> = { data: textData };
+            setLLMData(data);
+        } catch (error) {
+            console.error("Error fetching LLM data:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
