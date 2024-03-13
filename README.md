@@ -100,17 +100,43 @@ docker run --name fastapi --network dse-net -p 8080:80 --env-file ./.env -d text
 First confirm the FastAPI server is running by navigating to [http://localhost:8080/](http://localhost:8080/). You should see a page with content:
 
 ```
-{"message":"Hello, World! Fastapi Container is Working!"}
+Hello, World! Fastapi Container is Working!
 ```
 
 Next confirm the CQL interface to DSE is working running by navigating to [http://localhost:8080/test-cql?db=dse](http://localhost:8080/test-cql?db=dse). You should see a page with content:
 
 ```
-{"data":[{"data_center":"dc1","schema_version":"42ce1837-8122-3c50-b694-68185a247dd4"}]}
+[{"data_center":"dc1","schema_version":"42ce1837-8122-3c50-b694-68185a247dd4"}]
+```
+
+Next confirm the CQL interface to Astra is working running by navigating to [http://localhost:8080/test-cql?db=astra](http://localhost:8080/test-cql?db=astra). You should see a page with content:
+
+```
+[{"data_center":"eu-west-1","schema_version":"e3098d89-726b-3eea-ac99-64afc9e166c5"}]
 ```
 
 Next, confirm the LLM functions by navigating to [http://localhost:8080/test-llm?city=Dublin](http://localhost:8080/test-llm?city=Dublin). You should see a page with content similar to:
 
 ```
-{"data":"Morning:\n- Start the day with a visit to Trinity College to see the Book of Kells and explore the beautiful campus.\n- Stroll through the lively streets of Temple Bar, known for its trendy shops, cafes, and street performers.\n- Enjoy a traditional Irish breakfast at a local cafe.\n\nAfternoon:\n- Visit the Guinness Storehouse for a tour of the brewery and a pint of Guinness at the rooftop bar with panoramic views of the city.\n- Explore Dublin Castle and learn about the city's history and heritage.\n- Take a walk along the River Liffey and cross the iconic Ha'penny Bridge.\n\nEvening:\n- Have dinner at a cozy Irish pub and enjoy live music and dancing.\n- End the day with a visit to the lively Grafton Street for some shopping and street entertainment."}
+Here's a suggested one-day tour plan for Dublin:
+
+Morning:
+1. Start your day with a visit to the historic Dublin Castle, and explore its beautiful gardens and state apartments.
+
+Mid-morning:
+2. Walk over to Christ Church Cathedral, one of Dublin's most iconic landmarks, and take a guided tour to learn about its rich history and architecture.
+
+Lunch:
+3. Enjoy a traditional Irish lunch at a nearby cozy pub or restaurant, and savor some local specialties like Irish stew or fish and chips.
+
+Afternoon:
+4. Take a stroll through the bustling Temple Bar district, known for its colorful street art, lively pubs, and vibrant atmosphere.
+
+Late afternoon:
+5. Head to Trinity College and marvel at the famous Book of Kells, a beautifully illuminated manuscript dating back to the 9th century, housed in the stunning library.
+
+Evening:
+6. Finish the day with a visit to the Guinness Storehouse, where you can learn about the brewing process, enjoy panoramic views of the city from the Gravity Bar, and savor a pint of Guinness.
+
+This itinerary provides a great mix of historical landmarks, cultural experiences, and delicious Irish cuisine. Enjoy your day in Dublin!
 ```

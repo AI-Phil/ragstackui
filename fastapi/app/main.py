@@ -12,7 +12,7 @@ app = FastAPI()
 connections_manager = CassandraConnectionsManager()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-@app.get("/")
+@app.get("/", response_class=PlainTextResponse)
 def read_root():
     """
     Basic echo function  
