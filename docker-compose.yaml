@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  dse:
+    build:
+      context: ./dse
+      dockerfile: Dockerfile
+    image: ragstackui-dse:latest
+    env_file:
+      - ./.env
+    ports:
+      - "9042:9042"
+    networks:
+      - ragstack-net
+    command: "-k"
+
+  fastapi:
+    build:
+      context: ./fastapi
+      dockerfile: Dockerfile
+    image: ragstackui-fastapi:latest
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    networks:
+      - ragstack-net
+
+  next_js:
+    build:
+      context: ./next.js
+      dockerfile: Dockerfile
+    image: ragstackui-next.js:latest
+    env_file:
+      - ./.env
+    ports:
+      - "3000:3000"
+    networks:
+      - ragstack-net
+
+# docker network create ragstack-net
+networks:
+  ragstack-net:
+    external: true
+    name: ragstack-net

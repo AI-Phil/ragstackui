@@ -6,7 +6,7 @@ import { request as httpRequest } from 'http';
 import { URL } from 'url';
 
 
-const ragStackEndpoint=process.env.RAGSTACK_API_ENDPOINT || "http://fastapi:80";
+const ragStackEndpoint=process.env.RAGSTACK_API_ENDPOINT || "http://fastapi:8000";
 
 // Config to inform Next.js that we're resolving responses externally
 export const config = {

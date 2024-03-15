@@ -9,6 +9,12 @@ if [ -f "$SETUP_DONE" ]; then
     exit 0
 fi
 
+if [ -z "${DS_LICENSE}" -o "${DS_LICENSE}" != "accept" ]; then
+    echo "Not running the DSE setup because the DS_LICENSE variable is not set to 'accept'"
+    touch $SETUP_DONE
+    exit 0
+fi
+
 echo "Setting Up DSE Database"
 
 # sleep until DSE is ready

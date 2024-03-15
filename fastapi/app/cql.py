@@ -26,28 +26,41 @@ def parse_connection_args_json(conn_args_str):
 
 class CassandraConnectionsManager:
     def __init__(self):
+        self.connection_params = {}
         self.connections = {}
-        # Setup DSE connection if DSE_CONNECTION env var is set
+
+        # Store DSE connection params if DSE_CONNECTION env var is set
         dse_conn_str = os.getenv("DSE_CONNECTION")
         if dse_conn_str:
-            try:
-                self.connections['dse'] = CassandraConnector(**parse_connection_args_json(dse_conn_str))
-            except:
-                print(f"Failed to setup DSE connection with DSE_CONNECTION environment variable")
+            self.connection_params['dse'] = parse_connection_args_json(dse_conn_str) 
 
-        # Setup Astra connection if Astra env vars are set
+        # Store Astra connection params if Astra env vars are set
         astra_endpoint = os.getenv("ASTRA_DB_API_ENDPOINT")
         astra_token = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
         if astra_endpoint and astra_token:
-            try:
-                self.connections['astra'] = CassandraConnector(astra={'endpoint': astra_endpoint, 'token': astra_token})
-            except:
-                print(f"Failed to setup Astra connection with endpoint: {astra_endpoint}")
+            self.connection_params['astra'] = {'endpoint': astra_endpoint, 'token': astra_token}
 
     def get_connector(self, db_key):
-        if db_key not in self.connections:
-            raise ValueError(f"Connection for '{db_key}' not configured.")
-        return self.connections[db_key]
+        # Return the existing connector if it's already initialized
+        if db_key in self.connections:
+            return self.connections[db_key]
+
+        # Lazy-load the connection upon first request
+        if db_key in self.connection_params:
+            try:
+                if db_key == 'dse':
+                    self.connections[db_key] = CassandraConnector(**self.connection_params[db_key])
+                elif db_key == 'astra':
+                    self.connections[db_key] = CassandraConnector(astra=self.connection_params[db_key])                   
+                print(f"Connection for '{db_key}' initialized successfully.")
+            except Exception as e:
+                print(f"Failed to setup connection for '{db_key}'")
+                print(f"Error: {str(e)}")
+                raise ValueError(f"Connection for '{db_key}' could not be initialized.")
+            return self.connections[db_key]
+
+        # If the connection key is not recognized or parameters were not provided
+        raise ValueError(f"Connection parameters for '{db_key}' not configured.")
 
 class CassandraConnector:
     def __init__(self, **connectionArgs):

@@ -9,7 +9,7 @@ WORKDIR /app
 COPY . .
 RUN npm run build
 
-FROM base as production
+FROM base
 WORKDIR /app
 
 ENV NODE_ENV=production
