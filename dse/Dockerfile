@@ -1,4 +1,7 @@
+# x86-64 image:
 FROM cr.dtsx.io/datastax/dse-server:6.8.37
+# Apple ARM image:
+#FROM datastaxlabs/dse-server:6.8.34
 
 # COPY config/* /config
 

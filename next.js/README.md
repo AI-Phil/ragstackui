@@ -7,11 +7,21 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 **This should be run from within the `next.js` directory.**
 
 ### Setup
-Create a `.env.development` file; this will connect to the FastAPI development service that is running either within the Docker container, or on a local `uvicorn` service:
+Create a `.env.development` file:
 
+bash:
+```bash
+cp ../.env .env.development
+echo "RAGSTACK_API_ENDPOINT=http://localhost:8001" >> .env.development
 ```
-RAGSTACK_API_ENDPOINT=http://localhost:8001
+
+PowerShell:
+```powershell
+Copy-Item ../.env -Destination .env.development
+Add-Content -Path .env.development -Value "RAGSTACK_API_ENDPOINT=http://localhost:8001" -Encoding UTF8
 ```
+
+This will connect to the FastAPI development service that is running either within the Docker container, or on a local `uvicorn` service.
 
 ### Run Service
 
@@ -49,14 +59,14 @@ If you need to make changes to the Next.js `Dockerfile`, this section is for you
 
 The project `.env` file will be used, as this container will run within the same network as is referenced by the Docker Compose configuration.
 
-If you wish to use the FastAPI development container, you'll need to create/adjust `.env.development`:
+If you wish to use the FastAPI development container, you'll need to create/adjust `.env.development`.
 
+To reference the `fastapi-dev` container from the `next_js` container:
 ```
 RAGSTACK_API_ENDPOINT=http://fastapi-dev:8000
 ```
 
-or, if you want to reference a local `uvicorn` instance:
-
+or, if you want to reference a local `uvicorn` instance from within the `next_js` container:
 ```
 RAGSTACK_API_ENDPOINT=http://host.docker.internal:8001
 ```

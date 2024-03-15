@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ApiErrorResponse } from '../../types/RAGStack/ragstack';
 import { TestCQLData, CqlDB } from '../../types/RAGStack/test-cql';
 
@@ -12,8 +12,17 @@ export default function TestSetup() {
     const [error, setError] = useState<string | null>(null);
     const [database, setDatabase] = useState<CqlDB>('dse');
     const [cqlData, setCqlData] = useState<TestCQLData[] | null>(null);
-    const [city, setCity] = useState<string>('Dublin'); 
+    const [city, setCity] = useState<string>('Dublin');
     const [llmData, setLLMData] = useState<string | null>(null);
+    const [showDSE, setShowDSE] = useState(false);
+
+    useEffect(() => {
+        fetch('/api/use-dse')
+            .then((res) => res.json())
+            .then((data) => {
+                setShowDSE(data.hasDSEConnection);
+            });
+    }, []);
 
     const runCQLQuery = async () => {
         setLoading(true);
@@ -40,24 +49,24 @@ export default function TestSetup() {
         setLoading(true);
         setError(null);
         let partialData = ''; // This will accumulate chunks of data as they arrive
-    
+
         try {
             const response = await fetch(`/api/RAGStack/test-llm?city=${city}`);
             if (!response.ok) {
                 const errResponse: ApiErrorResponse = await response.json();
                 throw new Error(errResponse.detail);
             }
-    
+
             // Check if response.body is not null before proceeding
             if (response.body) {
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder(); // Used to decode the stream's chunks into text
-    
+
                 // Read through the stream chunk by chunk
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break; // The stream has been fully read
-                    
+
                     partialData += decoder.decode(value, { stream: true }); // Decode chunk and append it
                     setLLMData(partialData); // Update state with the accumulated content
                 }
@@ -72,22 +81,22 @@ export default function TestSetup() {
             setLoading(false);
         }
     };
-    
-    
+
+
     return (
         <div>
             <div className="text-center p-4">
-                <h1 className="text-4xl font-bold">Test Setup Page</h1>
+                <h1 className="text-4xl font-bold dark:text-white">Test Setup Page</h1>
             </div>
             <div className="flex justify-center p-4 border-b-2">
                 <button
-                    className={`mr-4 py-2 px-4 ${activeTab === 'cql' ? 'text-blue-500 border-blue-500 border-b-2' : 'text-gray-500 border-transparent border-b-2'}`}
+                    className={`mr-4 py-2 px-4 ${activeTab === 'cql' ? 'tab-active' : 'tab-inactive'}`}
                     onClick={() => setActiveTab('cql')}
                 >
                     Test CQL
                 </button>
                 <button
-                    className={`py-2 px-4 ${activeTab === 'llm' ? 'text-blue-500 border-blue-500 border-b-2' : 'text-gray-500 border-transparent border-b-2'}`}
+                    className={`mr-4 py-2 px-4 ${activeTab === 'llm' ? 'tab-active' : 'tab-inactive'}`}
                     onClick={() => setActiveTab('llm')}
                 >
                     Test LLM
@@ -95,7 +104,6 @@ export default function TestSetup() {
             </div>
             {activeTab === 'cql' && (
                 <div className="p-4 flex justify-center items-center flex-col">
-                    {/* Radio buttons and Run CQL button together */}
                     <div className="flex justify-center items-center mb-4">
                         <label className="flex items-center mr-4">
                             <input
@@ -107,18 +115,20 @@ export default function TestSetup() {
                             />
                             <span className="ml-2">Astra</span>
                         </label>
-                        <label className="flex items-center mr-4">
-                            <input
-                                type="radio"
-                                name="database"
-                                value="dse"
-                                checked={database === 'dse'}
-                                onChange={(e) => setDatabase(e.target.value as CqlDB)}
-                            />
-                            <span className="ml-2">DSE</span>
-                        </label>
+                        {showDSE && (
+                            <label className="flex items-center mr-4">
+                                <input
+                                    type="radio"
+                                    name="database"
+                                    value="dse"
+                                    checked={database === 'dse'}
+                                    onChange={(e) => setDatabase(e.target.value as CqlDB)}
+                                />
+                                <span className="ml-2">DSE</span>
+                            </label>
+                        )}
                         <button
-                            className="bg-blue-500 text-white p-2 rounded"
+                            className="button-primary"
                             onClick={runCQLQuery}
                         >
                             Run CQL
@@ -126,7 +136,7 @@ export default function TestSetup() {
                     </div>
                     {loading && <p>Calling for data...</p>}
                     {cqlData && (
-                        <div className="whitespace-pre-wrap bg-white p-4 border rounded shadow mt-4">
+                        <div className="whitespace-pre-wrap output-box">
                             {JSON.stringify(cqlData, null, 2)}
                         </div>
                     )}
@@ -140,11 +150,11 @@ export default function TestSetup() {
                             type="text"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
-                            className="mr-4 p-2 border rounded"
+                            className="input-box"
                             placeholder="Enter city"
                         />
                         <button
-                            className="bg-blue-500 text-white p-2 rounded"
+                            className="button-primary"
                             onClick={runLLMQuery}
                         >
                             Run LLM
@@ -152,7 +162,7 @@ export default function TestSetup() {
                     </div>
                     {loading && !llmData && <p>Calling for data...</p>}
                     {llmData && (
-                        <div className="whitespace-pre-wrap bg-white p-4 border rounded shadow">
+                        <div className="whitespace-pre-wrap output-box">
                             {llmData}
                         </div>
                     )}

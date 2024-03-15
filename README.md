@@ -15,7 +15,8 @@ You need to be able to run `docker` and `docker compose` commands (or their equi
 The instructions also assume you are not running services on the following network ports:
 * 3000 : Webserver (Next.js)
 * 8000 : Python server (FastAPI)
-* 9042 : Cassandra / DSE
+
+Optionally, you may wish to run a DataStax Enterprise container, in which case port 9042 must also be open. In order to use the DSE container, you must be licensed to use DSE and configure `DS_LICENCE=accept` in the `.env` file below. By setting `DS_LICENCE=accept` you are agreeing to the DataStax License, see https://www.datastax.com/legal/msa.
 
 ## Getting Started
 
@@ -36,6 +37,34 @@ Create a Docker network with the following command:
 docker network create ragstack-net
 ```
 
+### DSE with Apple M-based Macs
+
+This section only applies if you are:
+
+1. Using DSE container
+2. On an Apple M-based Mac
+
+Edit `dse/Dockerfile`. You need to comment out (by adding a `#` to start of the line):
+
+```
+FROM cr.dtsx.io/datastax/dse-server:6.8.37
+```
+
+And comment in (by removing leading `#` from the line):
+
+```
+#FROM datastaxlabs/dse-server:6.8.34
+```
+
+The top of your `Dockerfile` should look like:
+
+```
+# x86-64 image:
+#FROM cr.dtsx.io/datastax/dse-server:6.8.37
+# Apple ARM image:
+FROM datastaxlabs/dse-server:6.8.34
+```
+
 ### Creating Services
 
 To start services for the first you'll need to `up` them while also building:
@@ -46,7 +75,11 @@ docker compose up --build -d
 
 ## Using / Testing
 
-You can now navigate to [http://localhost:3000/test-setup](http://localhost:3000/test-setup) where you can test database connectivity to Astra where "Run CQL" should give you a result similar to
+You can now navigate to [http://localhost:3000/test-setup](http://localhost:3000/test-setup).
+
+### Test CQL
+
+Here you can test database connectivity to Astra where "Run CQL" should give you a result similar to
 
 ```
 [
@@ -57,13 +90,13 @@ You can now navigate to [http://localhost:3000/test-setup](http://localhost:3000
 ]
 ```
 
-And where "Run LLM" will generate an interesting-looking one day tour of a city.
+### Test LLM
 
-From here, explore other demonstrators via the menu options.
+Here "Run LLM" will generate an interesting-looking one day tour of a city.
 
 ## Maintaining 
 
-### Pausing/Removing Services
+### Pausing/Resuming Services
 
 To suspend services and keep the server state:
 
@@ -76,17 +109,9 @@ And to restart:
 docker compose start
 ```
 
-### Deleting Services
-
-To remove this from your Docker environment:
-
-```bash
-docker compose down
-```
-
 ### Upgrading Project
 
-To update to the latest version, simply download the latest code. From here simply create the services again:
+To update to the latest version, simply download the latest code. From here simply create the services again (this command will delete and rebuild them):
 
 ```bash
 docker compose up --build -d
@@ -96,6 +121,15 @@ One caveat: if you are running a local DSE service, you will want to amend the p
 
 ```bash
 docker compose up --build -d fastapi next_js
+```
+
+### Deleting Services
+
+To remove this from your Docker environment:
+
+```bash
+docker compose down
+docker network rm ragstack-net
 ```
 
 ## Contributing
