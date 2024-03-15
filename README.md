@@ -8,6 +8,8 @@ It should help you understand how to build some common GenAI use cases that use 
 
 ## Requirements
 
+You should have a [DataStax Astra Vector Search](https://www.datastax.com/products/vector-search) database created.
+
 You need to be able to run `docker` and `docker compose` commands (or their equivalents).
 
 The instructions also assume you are not running services on the following network ports:
@@ -41,6 +43,23 @@ To start services for the first you'll need to `up` them while also building:
 ```bash
 docker compose up --build -d
 ```
+
+## Using / Testing
+
+You can now navigate to [http://localhost:3000/test-setup](http://localhost:3000/test-setup) where you can test database connectivity to Astra where "Run CQL" should give you a result similar to
+
+```
+[
+  {
+    "data_center": "eu-west-1",
+    "schema_version": "e3098d89-726b-3eea-ac99-64afc9e166c5"
+  }
+]
+```
+
+And where "Run LLM" will generate an interesting-looking one day tour of a city.
+
+From here, explore other demonstrators via the menu options.
 
 ## Maintaining 
 
